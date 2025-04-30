@@ -49,7 +49,7 @@ def dibujar_tablero(pantalla, y_verde, y_rojo):
 
             # Si es casilla especial, dibuja bandera
             if (fila, col) in CASILLAS_ESPECIALES:
-                pantalla.blit(img_bandera, (x, y))
+                pantalla.blit(img_bandera_blanca, (x, y))
 
             # Bordes de celda
             pygame.draw.rect(pantalla, COLOR_NEGRO, (x, y, DIMENSION_CELDA, DIMENSION_CELDA), 1)
