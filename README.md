@@ -6,6 +6,17 @@
 
 ---
 
+## Autores
+    Jorge Enrique Alvarez Valderrama – 2125356 <jorge.valderrama@correounivalle.edu.co>
+
+    Kevin Jordan Alzate – 2228507 <kevin.jordan@correounivalle.edu.co>
+
+    Heidy Mina Garcia – 1931720 <heidy.mina@correounivalle.edu.co>
+
+    Junior Orlando Cantor Arévalo – 2224949 <junior.cantor@correounivalle.edu.co>
+
+---
+
 ## Descripción
 
 **Yoshi’s Zones** es un juego de dos jugadores (máquina vs. humano) sobre un tablero de 8×8. Cada jugador controla un Yoshi (verde para la máquina, rojo para el humano) que se mueve como un caballo de ajedrez. En las cuatro esquinas del tablero hay “zonas especiales”, cada una compuesta por la esquina y sus cuatro casillas adyacentes.  
@@ -48,9 +59,56 @@
 
 ## Estructura del repositorio
 
+### Carpeta `app/algoritmos/`
+
+- **sample**  
+  sample.
+
+### Carpeta `app/interfaz/`
+
+- **`menu.py`**  
+    Script de la **interfaz gráfica** (Tkinter):
+    - Ofrece un **ComboBox** para seleccionar la dificultad: Principiante, amateur o experto.
+    - Se muestra un **panel de texto** con introducción e instrucciones de juego, tambien señala la dificultad en que se inicio el juego y el resultad.
+    - Al pulsar "Iniciar" ejecuta el el juego con la dificultad deseada.
+    - Incluye boton **salir**.
+
+- **`tablero.py`**  
+  Se encarga de generar y mostrar visualmente el tablero de juego de Yoshi's Zones en una ventana con **Pygame**. Inicializa las posiciones aleatorias de los Yoshis (verde y rojo), resalta las casillas especiales (zonas grises en las esquinas), y permite su movimiento en "L" como caballos de ajedrez. Controlará la lógica del juego, conteo de casillas marcadas y el sistema de turnos.
+
+### Archivo `app/main.py`
+
+Script principal para ejecutar la aplicación:
+- Lanza la interfaz gráfica del proyecto.
+- Punto de entrada para toda la aplicación.
+
 ---
 
-## Cómo ejecutar
+## Ejecución del Proyecto
+
+### Requisitos previos
+- **Python** versión 3.8 o superior
+- **Git** para clonar el repositorio
+
+### Inicialización estándar
+
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/cantor11/yoshis-zone.git
+   cd yoshis-zone
+   ```
+
+2. **Instalar dependencias:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Ejecutar la aplicación principal:**
+   ```bash
+   python ./app/main.py
+   ```
+
+Esto abrirá una interfaz gráfica construida con Tkinter. Desde allí, podrás seleccionar una dificultad y hacer clic en **Iniciar**, lo cual lanzará el tablero de juego generado con Pygame.
 
 ---
 
