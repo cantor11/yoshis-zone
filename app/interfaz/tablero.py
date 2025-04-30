@@ -17,8 +17,18 @@ CASILLAS_ESPECIALES = [(0, 0), (0, 1), (0, 2), (0, 5), (0, 5), (0, 6), (0, 7), (
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 img_yoshi_verde = pygame.image.load(os.path.join(BASE_DIR, "assets", "imagenes", "yoshi-verde.png"))
 img_yoshi_rojo = pygame.image.load(os.path.join(BASE_DIR, "assets", "imagenes", "yoshi-rojo.png"))
+img_fondo = pygame.image.load(os.path.join(BASE_DIR, "assets", "imagenes", "suelo.png"))
+img_bandera_blanca = pygame.image.load(os.path.join(BASE_DIR, "assets", "imagenes", "bandera-blanca.png"))
+img_bandera_verde = pygame.image.load(os.path.join(BASE_DIR, "assets", "imagenes", "bandera-verde.png"))
+img_bandera_roja = pygame.image.load(os.path.join(BASE_DIR, "assets", "imagenes", "bandera-roja.png"))
+
+# Escalar imágenes
 img_yoshi_verde = pygame.transform.scale(img_yoshi_verde, (DIMENSION_CELDA, DIMENSION_CELDA))
 img_yoshi_rojo = pygame.transform.scale(img_yoshi_rojo, (DIMENSION_CELDA, DIMENSION_CELDA))
+img_fondo = pygame.transform.scale(img_fondo, (COLUMNAS * DIMENSION_CELDA, FILAS * DIMENSION_CELDA))
+img_bandera_blanca = pygame.transform.scale(img_bandera_blanca, (DIMENSION_CELDA, DIMENSION_CELDA))
+img_bandera_verde = pygame.transform.scale(img_bandera_verde, (DIMENSION_CELDA, DIMENSION_CELDA))
+img_bandera_roja = pygame.transform.scale(img_bandera_roja, (DIMENSION_CELDA, DIMENSION_CELDA))
 
 # Movimientos válidos en L (caballo de ajedrez)
 MOVIMIENTOS_L = [(-2, -1), (-2, 1), (-1, -2), (-1, 2),
@@ -30,23 +40,23 @@ def generar_posicion_random(evitar):
         if pos not in evitar:
             return pos
 
-
 def dibujar_tablero(pantalla, y_verde, y_rojo):
+    pantalla.blit(img_fondo, (0, 0))  # Fondo general del tablero
+
     for fila in range(FILAS):
         for col in range(COLUMNAS):
             x, y = col * DIMENSION_CELDA, fila * DIMENSION_CELDA
-            rect = pygame.Rect(x, y, DIMENSION_CELDA, DIMENSION_CELDA)
 
+            # Si es casilla especial, dibuja bandera
             if (fila, col) in CASILLAS_ESPECIALES:
-                pygame.draw.rect(pantalla, COLOR_GRIS, rect)
-            else:
-                pygame.draw.rect(pantalla, COLOR_BLANCO, rect)
+                pantalla.blit(img_bandera, (x, y))
 
-            pygame.draw.rect(pantalla, COLOR_NEGRO, rect, 1)
+            # Bordes de celda
+            pygame.draw.rect(pantalla, COLOR_NEGRO, (x, y, DIMENSION_CELDA, DIMENSION_CELDA), 1)
 
     # Dibujar Yoshis
-    pantalla.blit(img_yoshi_verde, (y_verde[1]*DIMENSION_CELDA, y_verde[0]*DIMENSION_CELDA))
-    pantalla.blit(img_yoshi_rojo, (y_rojo[1]*DIMENSION_CELDA, y_rojo[0]*DIMENSION_CELDA))
+    pantalla.blit(img_yoshi_verde, (y_verde[1] * DIMENSION_CELDA, y_verde[0] * DIMENSION_CELDA))
+    pantalla.blit(img_yoshi_rojo, (y_rojo[1] * DIMENSION_CELDA, y_rojo[0] * DIMENSION_CELDA))
 
 def obtener_movimientos_legales(pos):
     movimientos = []
