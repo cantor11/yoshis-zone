@@ -105,7 +105,7 @@ Script principal para ejecutar la aplicación:
 
 3. **Ejecutar la aplicación principal:**
    ```bash
-   python ./app/main.py
+   python main.py
    ```
 
 Esto abrirá una interfaz gráfica construida con Tkinter. Desde allí, podrás seleccionar una dificultad y hacer clic en **Iniciar**, lo cual lanzará el tablero de juego generado con Pygame.
