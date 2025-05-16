@@ -19,25 +19,37 @@ Solo se permiten movimientos en "L" como la pieza del caballo en ajedrez."""
 # Definición de las dificultades
 dificultades = ["...", "Principiante", "Amateur", "Experto"]
 
+def habilitar_controles():
+    boton_iniciar.config(state=NORMAL)
+    boton_borrar.config(state=NORMAL)
+    combo_algoritmo.config(state="readonly")
+
 # Función para iniciar la simulación
 def iniciar():
     if dificultad_seleccionada.get() == "...":
         messagebox.showerror("Error", "Debe seleccionar una dificultad antes de iniciar.")
         return
-    
-    # Texto para mostrar en el panel de texto
+
+    # 1) Deshabilito controles
+    boton_iniciar.config(state=DISABLED)
+    boton_borrar.config(state=DISABLED)
+    combo_algoritmo.config(state=DISABLED)
+
+    # 2) Actualizo el mensaje en el panel
     dificultad = dificultad_seleccionada.get()
     mensaje_iniciar = f"Iniciando Yoshi's zones en dificultad {dificultad}..."
+    panel_texto.configure(state="normal")
+    panel_texto.delete("1.0", END)
+    panel_texto.insert(END, MENSAJE_BIENVENIDA + "\n\n" + mensaje_iniciar)
+    panel_texto.configure(state="disabled")
+    raiz.update_idletasks()
+
+    # 3) Ejecuto el Pygame (bloquea aquí hasta que cierres la ventana)
+    main()
+
+    # 4) Programo la re‑habilitación 100 ms después
+    raiz.after(100, habilitar_controles)
     
-    # Limpiar el contenido anterior y agregar el nuevo mensaje
-    panel_texto.configure(state="normal")  # Permitir modificaciones en el texto
-    panel_texto.delete(1.0, END)  # Limpiar el contenido actual del Text widget
-    panel_texto.insert(END, MENSAJE_BIENVENIDA + "\n\n" + mensaje_iniciar)  # Insertar el mensaje
-    panel_texto.configure(state="disabled")  # Bloquear el widget de nuevo para que no se pueda editar
-
-    raiz.update_idletasks() # Actualizar la interfaz para mostrar el mensaje inmediatamente
-    main()  # Llamar a la función para crear el tablero con la dificultad seleccionada
-
 # Instanciamiento Tkinter
 raiz = Tk()
 raiz.title("Yoshi's zones")  # Titulo de la ventana
