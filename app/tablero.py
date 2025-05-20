@@ -3,20 +3,13 @@ import random
 import os
 from algoritmos.estado import GameState
 from algoritmos.ia import choose_move
+from algoritmos.estado import ZONAS
 
 # --- configuración gráfica ---
 DIM = 60
 ROWS, COLS = 8, 8
 MARGIN = 40  # espacio superior para marcador
 MOVES_L = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]
-CASILLAS_ESPECIALES = [
-    (0, 0), (0, 1), (0, 2), (0, 5), (0, 6), (0, 7),
-    (1, 0), (1, 7),
-    (2, 0), (2, 7),
-    (5, 0), (5, 7),
-    (6, 0), (6, 7),
-    (7, 0), (7, 1), (7, 2), (7, 5), (7, 6), (7, 7)
-]
 
 # Rutas de imágenes
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -52,28 +45,29 @@ def draw_board(screen, state: GameState, selected):
     screen.blit(IMG_BG, (0, MARGIN))
     pygame.draw.rect(screen, (30, 30, 30), (0, 0, COLS*DIM, MARGIN))
 
-    # 2) marcador en margen superior
-    font = pygame.font.SysFont(None, 24)
-    v = sum(1 for o in state.painted.values() if o == "verde")
-    r = sum(1 for o in state.painted.values() if o == "rojo")
-    screen.blit(font.render(f"Verde: {v}", True, (0,255,0)), (5, 8))
-    screen.blit(font.render(f"Rojo: {r}", True, (255,0,0)), (100, 8))
+    # 2) recalcular zonas ganadas y propietarios
+    vg, rg = state.zonas_ganadas()
+    
+    # 3) marcador numérico de zonas en margen
+    font = pygame.font.Font(None, 24)
+    screen.blit(font.render(f"Zonas Verde: {vg}", True, (0,255,0)), (5, 8))
+    screen.blit(font.render(f"Zonas Rojo:  {rg}", True, (255,0,0)), (150, 8))
 
-    # 3) banderas de casillas especiales no pintadas
+    # 4) banderas de casillas especiales no pintadas
     for cell in state.special:
         if cell not in state.painted:
             x = cell[1] * DIM
             y = cell[0] * DIM + MARGIN
             screen.blit(IMG_BF, (x, y))
 
-    # 4) banderas ya pintadas
+    # 5) banderas ya pintadas
     for cell, owner in state.painted.items():
         img = IMG_BV if owner == "verde" else IMG_BR
         x = cell[1] * DIM
         y = cell[0] * DIM + MARGIN
         screen.blit(img, (x, y))
 
-    # 5) resaltado de movimientos legales del rojo (si está seleccionado)
+    # 6) resaltado de movimientos legales del rojo (si está seleccionado)
     if selected:
         for mv in state.legal_moves("rojo"):
             r0, c0 = mv
@@ -81,14 +75,14 @@ def draw_board(screen, state: GameState, selected):
             s.fill((255, 0, 0, 100))
             screen.blit(s, (c0*DIM, r0*DIM + MARGIN))
 
-    # 6) grid
+    # 7) grid
     for row in range(ROWS):
         for col in range(COLS):
             x = col * DIM
             y = row * DIM + MARGIN
             pygame.draw.rect(screen, (0,0,0), (x, y, DIM, DIM), 1)
 
-    # 7) Yoshis
+    # 8) Yoshis
     yv = state.positions["verde"]
     yr = state.positions["rojo"]
     screen.blit(IMG_YV, (yv[1]*DIM, yv[0]*DIM + MARGIN))
@@ -104,10 +98,16 @@ def main(difficulty="Principiante"):
     clock = pygame.time.Clock()
 
     # Inicializar estado
-    state = GameState(tuple(CASILLAS_ESPECIALES))
-    state.positions["verde"] = generar_posicion_aleatoria(state.special)
-    used = set(state.special) | {state.positions["verde"]}
-    state.positions["rojo"] = generar_posicion_aleatoria(used)
+    # Obtener celdas especiales
+    special_cells = set().union(*ZONAS)
+    
+    # Inicializar estado con celdas especiales
+    state = GameState(tuple(special_cells))
+    state.positions["verde"] = generar_posicion_aleatoria(special_cells)
+    #Elige posición de 'verde' evitando **todas** las zonas especiales
+    evitar = special_cells | {state.positions["verde"]}
+    # Para 'rojo', evita las zonas especiales **y** la casilla ocupada por 'verde'
+    state.positions["rojo"] = generar_posicion_aleatoria(evitar)
 
     selected = None
     running = True
@@ -124,13 +124,9 @@ def main(difficulty="Principiante"):
 
         # Si terminó, mostrar mensaje final y salir
         if state.is_terminal():
-            pygame.time.delay(500)
-            v = sum(1 for o in state.painted.values() if o=="verde")
-            r = sum(1 for o in state.painted.values() if o=="rojo")
-            winner = "Empate" if v == r else ("Verde" if v > r else "Rojo")
-            pygame.time.delay(1500)
-            running = False
-            continue
+            vg, rg = state.zonas_ganadas()
+            winner = ("Verde" if vg>rg else "Rojo") if vg!=rg else "Empate"
+            return vg, rg, winner
 
         # Manejo de eventos
         for e in pygame.event.get():
@@ -152,5 +148,3 @@ def main(difficulty="Principiante"):
         clock.tick(30)
 
     pygame.quit()
-    # devolvemos métricas finales
-    return v, r, winner

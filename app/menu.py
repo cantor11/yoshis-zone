@@ -23,7 +23,9 @@ def habilitar_controles():
     combo_dificultad.config(state="readonly")
 
 def iniciar():
-    if dificultad_seleccionada.get() == "...":
+    dificultad = dificultad_seleccionada.get()
+    # Validar que se haya seleccionado una dificultad
+    if dificultad == "...":
         messagebox.showerror("Error", "Debe seleccionar una dificultad antes de iniciar.")
         return
 
@@ -33,21 +35,21 @@ def iniciar():
     combo_dificultad.config(state=DISABLED)
 
     # 2) Actualizar mensaje en el panel
-    dificultad = dificultad_seleccionada.get()
-    texto = f"Iniciando Yoshi's zones en dificultad {dificultad}..."
     panel_texto.configure(state="normal")
     panel_texto.delete("1.0", END)
-    panel_texto.insert(END, MENSAJE_BIENVENIDA + "\n" + texto)
+    panel_texto.insert(END, MENSAJE_BIENVENIDA + "\n" + f"\nIniciando dificultad: {dificultad}...\n")
     panel_texto.configure(state="disabled")
     raiz.update_idletasks()
 
     # 3) Ejecutar Pygame (bloquea hasta que cierres la ventana)
-    run_game()
+    v, r, winner = run_game(dificultad)
 
     # 4) Actualizar mensaje en el panel
-    v,r,winner = run_game(dificultad_seleccionada.get())
     panel_texto.configure(state="normal")
-    panel_texto.insert(END, f"\nFin de la partida: Verde {v} - Rojo {r} → Resultado: {winner}\n")
+    if winner == "Empate":
+        panel_texto.insert(END, f"\nFin de la partida → Verde: {v}  Rojo: {r}\n  ¡{winner}!\n")
+    else:
+        panel_texto.insert(END, f"\nFin de la partida → Verde: {v}  Rojo: {r}\n  ¡{winner} gana!\n")
     panel_texto.configure(state="disabled")
 
     # 5) Rehabilitar controles 100 ms después de cerrar Pygame
