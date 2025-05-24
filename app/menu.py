@@ -11,12 +11,12 @@ COLOR_FONDO = "#303030"
 COLOR_BOTON  = "#606060"
 COLOR_TEXTO  = "#FFFFFF"
 MENSAJE_BIENVENIDA = """Bienvenido a Yoshi's zones, para jugar selecciona una dificultad y luego dale al botón iniciar.\n
-El Yoshi que marque más casillas especiales con su color, gana.\n
+El Yoshi que marque más zonas especiales con su color, gana.\n
 Solo se permiten movimientos en "L" como la pieza del caballo en ajedrez.\n"""
 
 # Definición de las dificultades
 dificultades = ["...", "Principiante", "Amateur", "Experto"]
-
+            
 def habilitar_controles():
     boton_iniciar.config(state=NORMAL)
     boton_borrar.config(state=NORMAL)
@@ -37,22 +37,23 @@ def iniciar():
     # 2) Actualizar mensaje en el panel
     panel_texto.configure(state="normal")
     panel_texto.delete("1.0", END)
-    panel_texto.insert(END, MENSAJE_BIENVENIDA + "\n" + f"\nIniciando dificultad: {dificultad}...\n")
+    panel_texto.insert(END, MENSAJE_BIENVENIDA + f"\nIniciando dificultad: {dificultad}...\n")
     panel_texto.configure(state="disabled")
     raiz.update_idletasks()
 
-    # 3) Ejecutar Pygame (bloquea hasta que cierres la ventana)
-    v, r, winner = run_game(dificultad)
+    try:
+        v, r, winner = run_game(dificultad)
 
-    # 4) Actualizar mensaje en el panel
-    panel_texto.configure(state="normal")
-    if winner == "Empate":
-        panel_texto.insert(END, f"\nFin de la partida → Verde: {v}  Rojo: {r}\n  ¡{winner}!\n")
-    else:
-        panel_texto.insert(END, f"\nFin de la partida → Verde: {v}  Rojo: {r}\n  ¡{winner} gana!\n")
-    panel_texto.configure(state="disabled")
+        panel_texto.configure(state="normal")
+        if winner == "Empate":
+            panel_texto.insert(END, f"\nFin de la partida → Verde: {v}  Rojo: {r}\n  ¡{winner}!\n")
+        else:
+            panel_texto.insert(END, f"\nFin de la partida → Verde: {v}  Rojo: {r}\n  ¡{winner} gana!\n")
+        panel_texto.configure(state="disabled")
 
-    # 5) Rehabilitar controles 100 ms después de cerrar Pygame
+    except Exception as e:
+        messagebox.showerror("Error", f"Se abortó la partida. No hay resultado.")
+
     raiz.after(100, habilitar_controles)
 
 

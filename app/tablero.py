@@ -1,6 +1,4 @@
-import pygame
-import random
-import os
+import pygame, random, os
 from algoritmos.estado import GameState
 from algoritmos.ia import choose_move
 from algoritmos.estado import ZONAS
@@ -10,6 +8,8 @@ DIM = 60
 ROWS, COLS = 8, 8
 MARGIN = 40  # espacio superior para marcador
 MOVES_L = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]
+# Define un rectángulo que cubre exactamente el área jugable del tablero
+BOARD_RECT = pygame.Rect(0, MARGIN, COLS*DIM, ROWS*DIM)
 
 # Rutas de imágenes
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -29,14 +29,24 @@ for img_attr in ("IMG_BF", "IMG_BV", "IMG_BR", "IMG_YV", "IMG_YR"):
 def generar_posicion_aleatoria(evitar: set):
     """Devuelve una celda (fila, col) al azar que no esté en 'evitar'."""
     while True:
-        p = (random.randint(0, ROWS - 1), random.randint(0, COLS - 1))
+        p = (random.randint(0,ROWS-1), random.randint(0,COLS-1))
         if p not in evitar:
             return p
 
 def screen_to_cell(pos):
-    """Convierte coordenadas de pantalla a (fila, col)."""
+    """
+    Convierte coordenadas de pantalla a (fila, col).
+    Devuelve None si el clic cae fuera de BOARD_RECT.
+    """
     x, y = pos
-    return (y - MARGIN) // DIM, x // DIM
+    if not BOARD_RECT.collidepoint(x, y):
+        return None
+    # Localiza dentro del tablero
+    local_x = x - BOARD_RECT.x
+    local_y = y - BOARD_RECT.y
+    col = local_x // DIM
+    row = local_y // DIM
+    return (row, col)
 
 def draw_board(screen, state: GameState, selected):
     """Dibuja todo el tablero en pantalla."""
@@ -111,40 +121,60 @@ def main(difficulty="Principiante"):
 
     selected = None
     running = True
-
+    
     while running:
-        # IA mueve cuando sea su turno y no terminal
-        if state.turn == "verde" and not state.is_terminal():
-            mv = choose_move(state, difficulty)
-            if mv:
-                state.apply("verde", mv)
+        moved = False   # <-- bandera: el jugador acaba de mover?
 
-        draw_board(screen, state, selected)
-        pygame.display.flip()
-
-        # Si terminó, mostrar mensaje final y salir
-        if state.is_terminal():
-            vg, rg = state.zonas_ganadas()
-            winner = ("Verde" if vg>rg else "Rojo") if vg!=rg else "Empate"
-            return vg, rg, winner
-
-        # Manejo de eventos
+        # 1) Manejar eventos de usuario
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 running = False
 
             elif e.type == pygame.MOUSEBUTTONDOWN and state.turn == "rojo":
                 cell = screen_to_cell(e.pos)
-                # primer clic: seleccionar Yoshi
                 if selected is None:
                     if cell == state.positions["rojo"]:
                         selected = cell
                 else:
-                    # segundo clic: mover si es legal
                     if cell in state.legal_moves("rojo"):
+                        # **Aplica inmediatamente el movimiento rojo**
                         state.apply("rojo", cell)
-                    selected = None
+                        selected = None
+                        moved = True
+
+                        # **Redibuja de inmediato y muestra el movimiento**
+                        draw_board(screen, state, selected)
+                        pygame.display.flip()
+
+                        # Pequeña pausa para que se aprecie la jugada
+                        pygame.time.delay(200)
+
+        # 2) Si el jugador movió, saltamos IA este ciclo
+        if moved:
+            # Seguimos al siguiente frame sin ejecutar IA aún
+            clock.tick(30)
+            continue
+
+        # 3) Turno IA (verde) — sucede **después** de ver tu jugada
+        if state.turn == "verde" and not state.is_terminal():
+            mv = choose_move(state, difficulty)
+            if mv:
+                state.apply("verde", mv)
+
+        # 4) Dibujar estado actualizado
+        draw_board(screen, state, selected)
+        pygame.display.flip()
+
+        # 5) Comprobar final de partida
+        if state.is_terminal():
+            vg, rg = state.zonas_ganadas()
+            winner = ("Verde" if vg > rg else "Rojo") if vg != rg else "Empate"
+            pygame.time.delay(500)
+            pygame.quit()
+            return vg, rg, winner
 
         clock.tick(30)
+
+    pygame.quit()
 
     pygame.quit()
