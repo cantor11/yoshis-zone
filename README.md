@@ -7,13 +7,14 @@
 ---
 
 ## Autores
-    Jorge Enrique Alvarez Valderrama – 2125356 <jorge.valderrama@correounivalle.edu.co>
 
     Kevin Jordan Alzate – 2228507 <kevin.jordan@correounivalle.edu.co>
 
     Heidy Mina Garcia – 1931720 <heidy.mina@correounivalle.edu.co>
 
     Junior Orlando Cantor Arévalo – 2224949 <junior.cantor@correounivalle.edu.co>
+
+    -
 
 ---
 
@@ -61,8 +62,13 @@
 
 ### Carpeta `app/algoritmos/`
 
-- **sample**  
-  sample.
+- **`estado.py`**  
+  Contiene la lógica del juego, incluyendo el estado actual, las reglas de movimiento, el control de turnos, las zonas especiales, y la detección del final de la partida.
+
+
+
+- **`ia.py`**  
+  Implementa el algoritmo Minimax con profundidad variable según la dificultad, para que el Yoshi verde (IA) tome decisiones estratégicas durante el juego.
 
 ### Carpeta `app/interfaz/`
 
