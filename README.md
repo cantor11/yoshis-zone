@@ -14,7 +14,9 @@
 
     Junior Orlando Cantor Arévalo – 2224949 <junior.cantor@correounivalle.edu.co>
 
-    -
+    Jorge Enrique Álvarez Valderrama -
+    202125356
+    <Jorge.valderrama@correounivalle.edu.co>
 
 ---
 
